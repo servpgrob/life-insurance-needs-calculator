@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life Insurance Needs Calculator</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Apply modern typography */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #e0f7fa; /* Updated background color to Soft Sky Blue */
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column; /* Allow stacking of elements */
+    }
+
+    /* Fixed size container */
+    .container {
+      width: 700px; /* Fixed width */
+      min-height: 600px; /* Use min-height to fit content */
+      background-color: #ffffff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin: 20px;
+      overflow: hidden; /* Prevent scrolling */
+    }
+
+    /* Bigger Logo */
+    .logo {
+      max-width: 250px; /* Increased logo size */
+      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Input field styling */
+    .input-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .input-container i {
+      position: absolute;
+      left: 10px; /* Moved icon back into the input box */
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #888;
+    }
+    input {
+      width: 90%;
+      padding: 12px 12px 12px 40px; /* Adjusted padding to accommodate icon */
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    select {
+      width: 30%; /* Adjusted width for dropdowns */
+      padding: 8px;
+      margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    /* Progress bar styling */
+    .progress-bar {
+      width: 100%;
+      background-color: #f4f4f4;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      height: 10px;
+    }
+    .progress {
+      width: 12%;
+      height: 100%;
+      background-color: #38A1DB;
+      border-radius: 5px;
+      transition: width 0.4s ease;
+    }
+
+    /* Modern button styling */
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: linear-gradient(90deg, #38A1DB, #1C8FDB);
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .button:hover {
+      background: linear-gradient(90deg, #1C8FDB, #38A1DB);
+      transform: scale(1.05);
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    /* Section animations */
+    .section {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .section.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .results {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .disclaimer {
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
+      text-align: left;
+      width: 700px; /* Match container width */
+      padding: 0 20px; /* Add some padding */
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    footer a {
+      color: #38A1DB;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+  <!-- Include jsPDF library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- Container -->
+  <div class="container">
+    <!-- Logo at the top using Imgur link -->
+    <img src="https://i.imgur.com/bjsqkkx.png" alt="Company Logo" class="logo">
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div id="welcome" class="section active">
+      <h2>Welcome to the Life Insurance Needs Calculator!</h2>
+      <p>This calculator is designed to help you determine the appropriate amount of life insurance coverage you need based on your financial situation, family structure, and future goals. Life insurance plays a crucial role in ensuring your loved ones are financially secure in the event of your passing.</p>
+      <p>Follow the prompts to fill in your financial information. Click "Start" to begin.</p>
+      <div class="button-container">
+        <button class="button" onclick="nextSection(1)">Start</button>
+      </div>
+      <div class="disclaimer">
+        <strong>Disclaimer:</strong> The Life Insurance Needs Calculator provided on this website is intended for informational and educational purposes only. It is designed to help users estimate their potential life insurance needs based on the information entered. However, the results generated by this calculator are estimates and should not be considered financial advice.
+
+        Users are encouraged to consult with a qualified financial advisor or insurance professional to discuss their specific circumstances and obtain personalized advice tailored to their financial situation. The calculator does not take into account all factors that may influence life insurance needs, including individual financial goals, existing insurance coverage, health status, or changes in personal circumstances.
+
+        By using this calculator, you acknowledge that you understand and accept the limitations of the tool and that the accuracy of the results depends on the information provided. The website and its creators are not responsible for any decisions made based on the calculator's outputs.
+      </div>
+    </div>
+
+    <!-- Section 1 -->
+    <div id="section1" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="income">How much income would you want your family to receive annually if you're no longer here?</label>
+      <p>Estimate the amount your family would need to cover daily expenses. Typically, this is around 60-80% of your take-home income. Exclude college savings, childcare, or debts like a mortgage, as these will be addressed separately.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="income" placeholder="Enter your annual income" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 2);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="incomeError"></div>
+      <div class="button-container">
+        <button class="button" onclick="nextSection(2)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div id="section2" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="years">For how many years should your family receive income after your passing?</label>
+      <p>Consider how long your family will need this financial support. If you have children, you might want to provide for them until they finish high school, college, or beyond.</p>
+      <div class="input-container">
+        <i class="icon">📅</i>
+        <input type="number" id="years" placeholder="Enter the number of years" min="1" max="99" required oninput="limitToTwoDigits(this);" onkeypress="checkEnter(event, 3);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="yearsError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(1)">Back</button>
+        <button class="button" onclick="nextSection(3)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div id="section3" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="debt">How much debt would you like to pay off immediately?</label>
+      <p>Consider things like outstanding mortgage, private student loans, credit card balances, car loans, etc.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="debt" placeholder="Enter total debt" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 4);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="debtError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(2)">Back</button>
+        <button class="button" onclick="nextSection(4)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div id="section4" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="childcare">What amount do you wish to allocate for childcare annually?</label>
+      <p>Think about the expenses associated with childcare services in your local area and the duration for which you will require them. If you are a stay-at-home parent, you will likely need to arrange for childcare if you are no longer available to care for your children. Remember that childcare requirements will evolve as your children grow. While younger children may require full-time childcare, this may become unnecessary as they age and can stay home alone while you work.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="childcare" placeholder="Enter childcare amount" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 5);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="childcareError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(3)">Back</button>
+        <button class="button" onclick="nextSection(5)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div id="section5" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="emergency">How much would you like to set aside for an emergency fund?</label>
+      <p>If you don’t already have one, it’s a good idea to set aside at least three to six months’ worth of expenses in your emergency fund.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="emergency" placeholder="Enter emergency fund amount" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 6);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="emergencyError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(4)">Back</button>
+        <button class="button" onclick="nextSection(6)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 6 -->
+    <div id="section6" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label>How many children require college funding?</label>
+      <p>Select the number of children you plan to send to college, along with the corresponding details. Click Next to Skip question if does not apply to you.</p>
+      <div id="childrenContainer">
+        <div id="child1" style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+          <select id="childrenCount" required>
+            <option value="" disabled selected>Number of children</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">13</option>
+            <option value="14">14</option>
+            <option value="15">15</option>
+            <option value="16">16</option>
+            <option value="17">17</option>
+            <option value="18">18</option>
+            <option value="19">19</option>
+            <option value="20">20</option>
+            <option value="21">21</option>
+            <option value="22">22</option>
+            <option value="23">23</option>
+            <option value="24">24</option>
+            <option value="25">25</option>
+          </select>
+          <select id="collegeType" required>
+            <option value="" disabled selected>College Type</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+          <select id="collegeLocation" required>
+            <option value="" disabled selected>Location</option>
+            <option value="in-state">In-State</option>
+            <option value="out-of-state">Out-of-State</option>
+          </select>
+        </div>
+      </div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(5)">Back</button>
+        <button class="button" onclick="nextSection(7)">Next</button>
+      </div>
+      <div class="error-message" id="childrenError"></div>
+    </div>
+
+    <!-- Section 7 -->
+    <div id="section7" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="finalExpenses">What final expenses should be covered?</label>
+      <p>Consider costs such as a funeral, burial, or other related expenses.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="finalExpenses" placeholder="Enter final expenses amount" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 8);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="finalExpensesError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(6)">Back</button>
+        <button class="button" onclick="nextSection(8)">Next</button>
+      </div>
+    </div>
+
+    <!-- Section 8 -->
+    <div id="section8" class="section">
+      <h2>Life Insurance Needs Calculator</h2>
+      <label for="existingInsurance">What amount of life insurance do you currently have?</label>
+      <p>Include any existing life insurance coverage you already have through your employer or other policies.</p>
+      <div class="input-container">
+        <i class="icon">$</i>
+        <input type="text" id="existingInsurance" placeholder="Enter existing insurance amount" required oninput="formatWithCommas(this);" onkeypress="checkEnter(event, 9);" onkeydown="return isNumberKey(event);">
+      </div>
+      <div class="error-message" id="existingInsuranceError"></div>
+      <div class="button-container">
+        <button class="button" onclick="prevSection(7)">Back</button>
+        <button class="button" onclick="nextSection(9)">Next</button>
+      </div>
+    </div>
+
+    <!-- Final Review Section -->
+    <div id="finalReview" class="section">
+      <h2>Final Review</h2>
+      <p>Thank you! Review your results below:</p>
+      <div class="results">
+        <p id="totalInsuranceReview" style="font-weight: bold; font-size: 24px;">Total Insurance Needed: </p> <!-- Display Total Insurance Needed -->
+      </div>
+      <div class="button-container">
+        <button class="button" onclick="startOver()">Start Over</button>
+        <button class="button" onclick="exportToPDF()">Export to PDF</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>Need more advice? Contact Us:</p>
+      <p>patrick@servantadvisors.com</p>
+      <p>(901) 630-4891</p>
+    </footer>
+  </div>
+
+  <script>
+    // Function to navigate to the next section
+    function nextSection(sectionNumber) {
+      const currentSection = document.querySelector('.section.active');
+      let valid = true; // Flag for validation
+
+      // Clear previous error messages
+      clearErrorMessages();
+
+      // Validate input based on the current section
+      if (currentSection.id === 'section1') {
+        const income = document.getElementById('income').value;
+        if (!income) {
+          document.getElementById('incomeError').innerText = 'Please enter your annual income.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section2') {
+        const years = document.getElementById('years').value;
+        if (!years) {
+          document.getElementById('yearsError').innerText = 'Please enter the number of years for income replacement.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section3') {
+        const debt = document.getElementById('debt').value;
+        if (!debt) {
+          document.getElementById('debtError').innerText = 'Please enter your total debt.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section4') {
+        const childcare = document.getElementById('childcare').value;
+        if (!childcare) {
+          document.getElementById('childcareError').innerText = 'Please enter your childcare amount.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section5') {
+        const emergency = document.getElementById('emergency').value;
+        if (!emergency) {
+          document.getElementById('emergencyError').innerText = 'Please enter your emergency fund amount.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section6') {
+        // Check if a number of children is selected, allow skipping
+        const childrenCount = document.getElementById('childrenCount').value;
+        if (!childrenCount) {
+          // If skipping, do not set valid to false
+        }
+      } else if (currentSection.id === 'section7') {
+        const finalExpenses = document.getElementById('finalExpenses').value;
+        if (!finalExpenses) {
+          document.getElementById('finalExpensesError').innerText = 'Please enter your final expenses amount.';
+          valid = false;
+        }
+      } else if (currentSection.id === 'section8') {
+        const existingInsurance = document.getElementById('existingInsurance').value;
+        if (!existingInsurance) {
+          document.getElementById('existingInsuranceError').innerText = 'Please enter your existing insurance amount.';
+          valid = false;
+        }
+      }
+
+      if (!valid) return; // Stop if validation fails
+
+      currentSection.classList.remove('active');
+
+      // Adjust the logic for the final review section
+      if (sectionNumber === 9) {
+        document.getElementById('finalReview').classList.add('active');
+      } else {
+        document.getElementById('section' + sectionNumber).classList.add('active');
+      }
+
+      updateProgress(sectionNumber); // Update progress bar
+
+      // Update review section content
+      if (sectionNumber === 9) {
+        updateReviewSection();
+      }
+    }
+
+    // Function to clear error messages
+    function clearErrorMessages() {
+      const errorFields = ['incomeError', 'yearsError', 'debtError', 'childcareError', 'emergencyError', 'childrenError', 'finalExpensesError', 'existingInsuranceError'];
+      errorFields.forEach(field => {
+        document.getElementById(field).innerText = '';
+      });
+    }
+
+    // Function to navigate to the previous section
+    function prevSection(sectionNumber) {
+      document.querySelector('.section.active').classList.remove('active');
+      document.getElementById('section' + sectionNumber).classList.add('active');
+      updateProgress(sectionNumber); // Update progress bar
+    }
+
+    // Function to update the review section content
+    function updateReviewSection() {
+      const income = document.getElementById('income').value.replace(/,/g, ''); // Remove commas for calculation
+      const years = document.getElementById('years').value;
+      const debt = document.getElementById('debt').value.replace(/,/g, ''); // Remove commas for calculation
+      const childcare = document.getElementById('childcare').value.replace(/,/g, ''); // Remove commas for calculation
+      const emergency = document.getElementById('emergency').value.replace(/,/g, ''); // Remove commas for calculation
+      const finalExpenses = document.getElementById('finalExpenses').value.replace(/,/g, ''); // Remove commas for calculation
+      const existingInsurance = document.getElementById('existingInsurance').value.replace(/,/g, ''); // Remove commas for calculation
+
+      // Calculate total insurance needed
+      const totalInsuranceNeeded = (parseFloat(income) * parseInt(years)) + parseFloat(debt) + parseFloat(childcare) + parseFloat(emergency) + parseFloat(finalExpenses) - parseFloat(existingInsurance);
+      
+      // Display total insurance needed
+      document.getElementById('totalInsuranceReview').innerText = `Total Insurance Needed: $${totalInsuranceNeeded.toLocaleString()}`;
+    }
+
+    // Function to update the progress bar
+    function updateProgress(sectionNumber) {
+      const progressBar = document.getElementById('progress');
+      const progressPercent = (sectionNumber / 9) * 100; // Assuming 9 sections including review
+      progressBar.style.width = progressPercent + '%';
+    }
+
+    // Function to format numbers with commas
+    function formatWithCommas(input) {
+      let value = input.value.replace(/,/g, ''); // Remove existing commas
+      if (!isNaN(value) && value !== '') {
+        input.value = Number(value).toLocaleString(); // Add commas
+      }
+    }
+
+    // Function to limit input to two digits
+    function limitToTwoDigits(input) {
+      if (input.value.length > 2) {
+        input.value = input.value.slice(0, 2);
+      }
+    }
+
+    // Function to check if Enter key is pressed
+    function checkEnter(event, sectionNumber) {
+      if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission
+        nextSection(sectionNumber); // Trigger the next section
+      }
+    }
+
+    // Function to allow only numeric input
+    function isNumberKey(evt) {
+      const charCode = (evt.which) ? evt.which : evt.keyCode;
+      if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false; // Prevent non-numeric characters
+      }
+      return true;
+    }
+
+// Export to PDF function
+async function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Gather data to include in the PDF
+  const income = document.getElementById('income').value.replace(/,/g, ''); // Remove commas for calculation
+  const years = document.getElementById('years').value;
+  const debt = document.getElementById('debt').value.replace(/,/g, ''); // Remove commas for calculation
+  const childcare = document.getElementById('childcare').value.replace(/,/g, ''); // Remove commas for calculation
+  const emergency = document.getElementById('emergency').value.replace(/,/g, ''); // Remove commas for calculation
+  const finalExpenses = document.getElementById('finalExpenses').value.replace(/,/g, ''); // Remove commas for calculation
+  const existingInsurance = document.getElementById('existingInsurance').value.replace(/,/g, ''); // Remove commas for calculation
+  const totalInsuranceNeeded = document.getElementById('totalInsuranceReview').innerText.replace(/Total Insurance Needed: \$/, '').replace(/,/g, '');
+
+  // Get college inputs
+  const childrenCount = document.getElementById('childrenCount').value;
+  const collegeType = document.getElementById('collegeType').value;
+  const collegeLocation = document.getElementById('collegeLocation').value;
+
+  // Define average costs (these are estimates and can be adjusted)
+  const costMapping = {
+    'public-in-state': 25000, // Annual cost for in-state public college
+    'public-out-of-state': 40000, // Annual cost for out-of-state public college
+    'private-in-state': 55000, // Annual cost for private college
+    'private-out-of-state': 60000 // Annual cost for private college
+  };
+
+  // Calculate college cost based on user inputs
+  let estimatedCollegeCost = 0;
+  if (childrenCount && collegeType && collegeLocation) {
+    const key = `${collegeType}-${collegeLocation}`;
+    const annualCost = costMapping[key] || 0;
+    const yearsInCollege = 4; // Assume 4 years for undergraduate studies
+    estimatedCollegeCost = annualCost * yearsInCollege * parseInt(childrenCount);
+  }
+
+  // Add the logo
+  const logoUrl = 'https://i.imgur.com/bjsqkkx.png'; // Replace with the actual URL if different
+  const logoImage = new Image();
+  logoImage.src = logoUrl;
+  logoImage.onload = () => {
+    doc.addImage(logoImage, 'PNG', 20, 10, 50, 20); // Adjust the x, y, width, and height as needed
+
+    // Draw a line below the logo
+    doc.setDrawColor(0); // Black color for the line
+    doc.line(20, 35, 190, 35); // Draw a line from x=20 to x=190 at y=35
+
+    // Add contact information
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('(901) 630-4891 | patrick@servantadvisors.com', 20, 45);
+    doc.text('1028 Oakhaven Road, Memphis, TN 38119', 20, 52);
+
+    // Add content to PDF
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.text('Life Insurance Needs Calculator Results', 20, 70);
+
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.text('Breakdown of Inputs:', 20, 85);
+
+    // Add detailed breakdown with a little spacing between each line
+    doc.text(`Income Replacement Need: $${Number(income).toLocaleString()} per year for ${years} years`, 20, 95);
+    doc.text(`Total Income Replacement: $${(Number(income) * Number(years)).toLocaleString()}`, 20, 105);
+    doc.text(`Debt to be Paid Off: $${Number(debt).toLocaleString()}`, 20, 115);
+    doc.text(`Childcare Costs: $${Number(childcare).toLocaleString()}`, 20, 125);
+    doc.text(`Emergency Fund: $${Number(emergency).toLocaleString()}`, 20, 135);
+    doc.text(`Final Expenses: $${Number(finalExpenses).toLocaleString()}`, 20, 145);
+    doc.text(`Existing Life Insurance: $${Number(existingInsurance).toLocaleString()}`, 20, 155);
+
+    // Display the college cost breakdown if available
+    if (estimatedCollegeCost > 0) {
+      doc.text(`College Education Costs for ${childrenCount} child(ren):`, 20, 175);
+      doc.text(`College Type: ${collegeType.charAt(0).toUpperCase() + collegeType.slice(1)} (${collegeLocation.replace('-', ' ')})`, 20, 185);
+      doc.text(`Estimated Total College Cost: $${Number(estimatedCollegeCost).toLocaleString()}`, 20, 195);
+    } else {
+      doc.text('College Education Costs: Not applicable or not provided', 20, 175);
+    }
+
+    // Display the total insurance needed
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text(`Total Insurance Needed: $${Number(totalInsuranceNeeded).toLocaleString()}`, 20, estimatedCollegeCost > 0 ? 215 : 185);
+
+    // Save the PDF
+    doc.save('Life_Insurance_Needs_Calculator_Results.pdf');
+  };
+}
+
+
+    // Function to start over the calculator
+function startOver() {
+  document.querySelector('.section.active').classList.remove('active');
+  document.getElementById('welcome').classList.add('active');
+  document.getElementById('progress').style.width = '0%'; // Reset progress bar
+
+  // Clear all input fields
+  document.getElementById('income').value = '';
+  document.getElementById('years').value = '';
+  document.getElementById('debt').value = '';
+  document.getElementById('childcare').value = '';
+  document.getElementById('emergency').value = '';
+  document.getElementById('finalExpenses').value = '';
+  document.getElementById('existingInsurance').value = '';
+
+  // Reset college education fields
+  document.getElementById('childrenCount').value = '';
+  document.getElementById('collegeType').value = '';
+  document.getElementById('collegeLocation').value = '';
+
+  // Reset review section
+  document.getElementById('totalInsuranceReview').innerText = ''; // Reset total insurance needed
+  
+  clearErrorMessages(); // Clear error messages
+}
+
+  </script>
+</body>
+</html>
